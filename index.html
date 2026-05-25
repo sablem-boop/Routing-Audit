@@ -471,7 +471,6 @@
             <h2 style="text-align: left; margin-bottom: 24px;">📊 Закажите независимый аудит</h2>
             <p style="margin-bottom: 28px;">Мы пришлём предварительный срез по доставляемости, стоимости + 3 кандидата на замену худших каналов. Бесплатно и без обязательств.</p>
             
-            <!-- Важно: action ведёт на AJAX-адрес, форма больше не будет перезагружать страницу -->
             <form id="contactForm" action="https://formsubmit.co/ajax/mariya.sable@yandex.ru" method="POST">
                 <input type="hidden" name="_subject" value="Новая заявка на аудит маршрутов с лендинга">
                 
@@ -492,8 +491,17 @@
                 <div class="form-group">
                     <input type="text" name="countries" placeholder="Основные страны (РФ, Казахстан, Европа...)" required>
                 </div>
+                
+                <!-- Checkbox with clickable privacy policy link -->
+                <div class="form-group" style="display: flex; align-items: center; gap: 12px; margin: 20px 0;">
+                    <input type="checkbox" id="privacyConsent" name="privacyConsent" value="agree" required style="width: 20px; height: 20px; margin: 0;">
+                    <label for="privacyConsent" style="font-size: 14px; color: #4a5568;">
+                        Я соглашаюсь с <a href="/privacy.html" target="_blank" style="color: #e53e3e; text-decoration: underline;">Политикой конфиденциальности</a> и даю согласие на обработку персональных данных
+                    </label>
+                </div>
+                
                 <button type="submit" class="btn" style="width:100%;">Получить экспресс-аудит →</button>
-                <div class="privacy">Данные не передаём третьим лицам. Никакого спама — только результат.</div>
+                <div class="privacy">Никакого спама — только результат.</div>
             </form>
             <div id="formStatus" style="margin-top: 15px; text-align: center; font-weight: 500;"></div>
         </div>
@@ -502,13 +510,20 @@
 
 <script>
 document.getElementById('contactForm').addEventListener('submit', function(event) {
-    event.preventDefault(); // Останавливаем стандартную отправку формы
+    event.preventDefault(); // Останавливаем стандартную отправку
 
     const form = event.target;
-    const formData = new FormData(form);
+    const checkbox = document.getElementById('privacyConsent');
     const statusDiv = document.getElementById('formStatus');
 
-    // Показываем сообщение о загрузке
+    // Проверяем, что чекбокс отмечен
+    if (!checkbox.checked) {
+        statusDiv.innerHTML = '❌ Пожалуйста, подтвердите согласие с Политикой конфиденциальности.';
+        statusDiv.style.color = 'red';
+        return;
+    }
+
+    const formData = new FormData(form);
     statusDiv.innerHTML = '⏳ Отправка...';
     statusDiv.style.color = '#e53e3e';
 
@@ -518,10 +533,11 @@ document.getElementById('contactForm').addEventListener('submit', function(event
     })
     .then(response => response.json())
     .then(data => {
-        if (data.success === 'true' || data.message === 'OK') { // FormSubmit возвращает success: "true" при успехе
+        if (data.success === 'true' || data.message === 'OK') {
             statusDiv.innerHTML = '✅ Спасибо! Мы свяжемся с вами в ближайшее время.';
             statusDiv.style.color = 'green';
-            form.reset(); // Очищаем форму
+            form.reset();
+            checkbox.checked = false; // сбросить чекбокс
         } else {
             statusDiv.innerHTML = '❌ Ошибка при отправке. Пожалуйста, попробуйте позже.';
             statusDiv.style.color = 'red';
