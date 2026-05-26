@@ -492,13 +492,20 @@
                     <input type="text" name="countries" placeholder="Основные страны (РФ, Казахстан, Европа...)" required>
                 </div>
                 
-                <!-- Checkbox with clickable privacy policy link -->
-                <div class="form-group" style="display: flex; align-items: center; gap: 12px; margin: 20px 0;">
-                    <input type="checkbox" id="privacyConsent" name="privacyConsent" value="agree" required style="width: 20px; height: 20px; margin: 0;">
-                    <label for="privacyConsent" style="font-size: 14px; color: #4a5568;">
-                        Я соглашаюсь с <a href="/privacy.html" target="_blank" style="color: #e53e3e; text-decoration: underline;">Политикой конфиденциальности</a> и даю согласие на обработку персональных данных
-                    </label>
-                </div>
+                <!-- Checkboxes with clickable privacy policy link -->
+<div class="form-group" style="display: flex; align-items: center; gap: 12px; margin: 20px 0;">
+    <input type="checkbox" id="consentPersonal" name="consentPersonal" value="agree" required style="width: 20px; height: 20px; margin: 0;">
+    <label for="consentPersonal" style="font-size: 14px; color: #4a5568;">
+        Я даю согласие на обработку моих персональных данных (ФИО, телефон, email) в соответствии с <a href="/privacy.html" target="_blank" style="color: #e53e3e; text-decoration: underline;">Политикой обработки персональных данных</a>
+    </label>
+</div>
+
+<div class="form-group" style="display: flex; align-items: center; gap: 12px; margin: 20px 0;">
+    <input type="checkbox" id="consentPrivacy" name="consentPrivacy" value="agree" required style="width: 20px; height: 20px; margin: 0;">
+    <label for="consentPrivacy" style="font-size: 14px; color: #4a5568;">
+        Я ознакомлен(а) и согласен(на) с <a href="/privacy-policy.html" target="_blank" style="color: #e53e3e; text-decoration: underline;">Политикой конфиденциальности</a> сайта
+    </label>
+</div>
                 
                 <button type="submit" class="btn" style="width:100%;">Получить экспресс-аудит →</button>
                 <div class="privacy">Никакого спама — только результат.</div>
@@ -646,5 +653,51 @@ document.getElementById('contactForm').addEventListener('submit', function(event
         };
     });
 </script>
+    document.getElementById('contactForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    const consentPersonal = document.getElementById('consentPersonal');
+    const consentPrivacy = document.getElementById('consentPrivacy');
+    const statusDiv = document.getElementById('formStatus');
+
+    if (!consentPersonal.checked) {
+        statusDiv.innerHTML = '❌ Необходимо дать согласие на обработку персональных данных.';
+        statusDiv.style.color = 'red';
+        return;
+    }
+    if (!consentPrivacy.checked) {
+        statusDiv.innerHTML = '❌ Необходимо подтвердить согласие с Политикой конфиденциальности.';
+        statusDiv.style.color = 'red';
+        return;
+    }
+
+    // Далее идёт отправка формы через fetch...
+    const form = event.target;
+    const formData = new FormData(form);
+    statusDiv.innerHTML = '⏳ Отправка...';
+    statusDiv.style.color = '#e53e3e';
+
+    fetch(form.action, {
+        method: form.method,
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success === 'true' || data.message === 'OK') {
+            statusDiv.innerHTML = '✅ Спасибо! Заявка отправлена.';
+            statusDiv.style.color = 'green';
+            form.reset();
+            consentPersonal.checked = false;
+            consentPrivacy.checked = false;
+        } else {
+            statusDiv.innerHTML = '❌ Ошибка при отправке. Попробуйте позже.';
+            statusDiv.style.color = 'red';
+        }
+    })
+    .catch(error => {
+        statusDiv.innerHTML = '❌ Ошибка соединения. Проверьте интернет.';
+        statusDiv.style.color = 'red';
+    });
+});
 </body>
 </html>
