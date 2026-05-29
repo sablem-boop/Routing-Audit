@@ -370,10 +370,15 @@
             .btn-large { width: 100%; }
             .form-container { padding: 32px 24px; }
         }
-        /* Увеличиваем чекбокс в 1.25 раза от стандартного размера */
+        /* Принудительно делаем все чекбоксы одинаковыми */
 input[type="checkbox"] {
-    transform: scale(1.25);
-    margin: 0 5px 0 0; /* Небольшой отступ справа */
+    width: 20px !important;
+    height: 20px !important;
+    min-width: 20px !important;
+    min-height: 20px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    flex-shrink: 0 !important;
 }
     </style>
 </head>
