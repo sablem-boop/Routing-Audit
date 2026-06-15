@@ -553,24 +553,30 @@ document.getElementById('contactForm').addEventListener('submit', function(event
     statusDiv.innerHTML = '⏳ Отправка...';
     statusDiv.style.color = '#e53e3e';
 
-    fetch(form.action, {
-        method: form.method,
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success === 'true' || data.message === 'OK') {
-            statusDiv.innerHTML = '✅ Спасибо! Заявка отправлена.';
+    try {
+        const response = await fetch(form.action, {
+            method: form.method,
+            body: formData,
+            headers: { 'Accept': 'application/json' }
+        });
+
+        // Пытаемся распарсить JSON, даже если статус не 200
+        const data = await response.json();
+
+        // Успешный ответ: статус 200 И поле success === true
+        if (response.ok && (data.success === true || data.message === 'OK')) {
+            statusDiv.innerHTML = '✅ Спасибо! Заявка отправлена. Мы свяжемся с вами.';
             statusDiv.style.color = 'green';
             form.reset();
             consentPersonal.checked = false;
             consentPrivacy.checked = false;
         } else {
-            statusDiv.innerHTML = '❌ Ошибка при отправке. Попробуйте позже.';
-            statusDiv.style.color = 'red';
+            // Если сервер вернул ошибку, но письмо всё равно могло уйти — покажем предупреждение
+            console.warn('Ответ сервера:', data);
+            statusDiv.innerHTML = '⚠️ Заявка, вероятно, отправлена, но сервер вернул неожиданный ответ. Мы проверим.';
+            statusDiv.style.color = 'orange';
         }
-    })
-    .catch(error => {
+    } catch (error) {
         console.error('Ошибка:', error);
         statusDiv.innerHTML = '❌ Ошибка соединения. Проверьте интернет.';
         statusDiv.style.color = 'red';
