@@ -495,60 +495,6 @@ input[type="checkbox"] {
         </div>
     </div>
 </section>
-<script>
-document.getElementById('contactForm').addEventListener('submit', function(event) {
-    event.preventDefault();
-
-    const consentPersonal = document.getElementById('consentPersonal');
-    const consentPrivacy = document.getElementById('consentPrivacy');
-    const statusDiv = document.getElementById('formStatus');
-
-    if (!consentPersonal.checked) {
-        statusDiv.innerHTML = '❌ Необходимо дать согласие на обработку персональных данных.';
-        statusDiv.style.color = 'red';
-        return;
-    }
-    if (!consentPrivacy.checked) {
-        statusDiv.innerHTML = '❌ Необходимо подтвердить согласие с Политикой конфиденциальности.';
-        statusDiv.style.color = 'red';
-        return;
-    }
-
-    const form = event.target;
-    const formData = new FormData(form);
-    statusDiv.innerHTML = '⏳ Отправка...';
-    statusDiv.style.color = '#e53e3e';
-
-    try {
-        const response = await fetch(form.action, {
-            method: form.method,
-            body: formData,
-            headers: { 'Accept': 'application/json' }
-        });
-
-        // Пытаемся распарсить JSON, даже если статус не 200
-        const data = await response.json();
-
-        // Успешный ответ: статус 200 И поле success === true
-        if (response.ok && (data.success === true || data.message === 'OK')) {
-            statusDiv.innerHTML = '✅ Спасибо! Заявка отправлена. Мы свяжемся с вами.';
-            statusDiv.style.color = 'green';
-            form.reset();
-            consentPersonal.checked = false;
-            consentPrivacy.checked = false;
-        } else {
-            // Если сервер вернул ошибку, но письмо всё равно могло уйти — покажем предупреждение
-            console.warn('Ответ сервера:', data);
-            statusDiv.innerHTML = '⚠️ Заявка, вероятно, отправлена, но сервер вернул неожиданный ответ. Мы проверим.';
-            statusDiv.style.color = 'orange';
-        }
-    } catch (error) {
-        console.error('Ошибка:', error);
-        statusDiv.innerHTML = '❌ Ошибка соединения. Проверьте интернет.';
-        statusDiv.style.color = 'red';
-    });
-});
-</script>
 
 <!-- FAQ -->
 <section>
