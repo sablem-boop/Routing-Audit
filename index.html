@@ -481,19 +481,25 @@ input[type="checkbox"] {
             <h2 style="text-align: left; margin-bottom: 24px;">📊 Закажите независимый аудит</h2>
             <p style="margin-bottom: 28px;">Мы пришлём предварительный срез по доставляемости, стоимости + 3 кандидата на замену худших каналов. Бесплатно и без обязательств.</p>
             
-            <!-- Яндекс Форма через скрипт (адаптивно) -->
+            <!-- Яндекс Форма (без скролла) -->
             <div id="ya-form-container" style="width: 100%;">
                 <div id="ya-form-6a3e70c41f1eb5002cc7ea17"></div>
                 <script src="https://forms.yandex.ru/_static/embed.js" async></script>
                 <script>
                     document.addEventListener('DOMContentLoaded', function() {
-                        if (window.Ya && window.Ya.Forms) {
-                            new window.Ya.Forms.Embed({
-                                container: 'ya-form-6a3e70c41f1eb5002cc7ea17',
-                                url: 'https://forms.yandex.ru/u/6a3e70c41f1eb5002cc7ea17/',
-                                height: 'auto'
-                            });
+                        // Ждём загрузки скрипта Яндекса
+                        function initForm() {
+                            if (window.Ya && window.Ya.Forms) {
+                                new window.Ya.Forms.Embed({
+                                    container: 'ya-form-6a3e70c41f1eb5002cc7ea17',
+                                    url: 'https://forms.yandex.ru/u/6a3e70c41f1eb5002cc7ea17/',
+                                    height: '750px'  // ← фиксированная высота, подобрана под вашу форму
+                                });
+                            } else {
+                                setTimeout(initForm, 200);
+                            }
                         }
+                        initForm();
                     });
                 </script>
             </div>
